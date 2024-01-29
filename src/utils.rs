@@ -1,5 +1,78 @@
 use crate::models::TableColumn;
 
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "edit_note_status", rename_all = "lowercase")]
+pub enum EditNoteStatus {
+    Deleted,
+    Edited,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "fluency", rename_all = "lowercase")]
+pub enum Fluency {
+    Basic,
+    Intermediate,
+    Advanced,
+    Native,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "oauth_code_challenge_method", rename_all = "lowercase")]
+pub enum OauthCodeChallengeMethod {
+    Plain,
+    S256,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "taggable_entity_type", rename_all = "lowercase")]
+pub enum TaggableEntityType {
+    Area,
+    Artist,
+    Event,
+    Instrument,
+    Label,
+    Place,
+    Recording,
+    Release,
+    Release_Group,
+    Series,
+    Work,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "ratable_entity_type", rename_all = "lowercase")]
+pub enum RatableEntityType {
+    Artist,
+    Event,
+    Label,
+    Place,
+    Recording,
+    Release_Group,
+    Work,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "cover_art_presence", rename_all = "lowercase")]
+pub enum CoverArtPresence {
+    Absent,
+    Present,
+    Darkened,
+}
+
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "event_art_presence", rename_all = "lowercase")]
+pub enum EventArtPresence {
+    Absent,
+    Present,
+    Darkened,
+}
+
+// #[derive(sqlx::Type)]
+// #[sqlx(type_name = "cube")]
+// struct Cube {
+//
+// }
+
 pub(crate) fn to_snake_case(input: &str) -> String {
     let mut output = String::new();
     let mut prev_is_uppercase = false;
@@ -49,17 +122,31 @@ pub fn generate_struct_code(table_name: &str, rows: &Vec<TableColumn>) -> String
 pub fn convert_data_type(data_type: &str) -> &str {
     match data_type {
         "int8" => "i64",
+        "_int8" => "i64",
         "int4" => "i32",
+        "_int4" => "i32",
         "int2" => "i16",
+        "_int2" => "i16",
         "text" => "String",
+        "_text" => "String",
         "varchar" => "String",
         "jsonb" => "sqlx::Json",
         "timestamptz" => "chrono::DateTime<chrono::Utc>",
         "date" => "chrono::NaiveDate",
+        "time" => "chrono::NaiveTime",
         "float4" => "f32",
         "float8" => "f64",
         "uuid" => "uuid::Uuid",
         "boolean" => "bool",
+        "bool" => "bool",
+        "bpchar" => "char",
+        "edit_note_status" => "edit_note_status",
+        "fluency" => "fluency",
+        "oauth_code_challenge_method" => "oauth_code_challenge_method",
+        "taggable_entity_type" => "taggable_entity_type",
+        "ratable_entity_type" => "ratable_entity_type",
+        "event_art_presence" => "event_art_presence",
+        "cover_art_presence" => "cover_art_presence",
         "bytea" => "Vec<u8>", // is this right?
         _ => panic!("Unknown type: {}", data_type),
     }
