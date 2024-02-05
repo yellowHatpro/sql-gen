@@ -66,12 +66,18 @@ pub enum EventArtPresence {
     Present,
     Darkened,
 }
-
-// #[derive(sqlx::Type)]
-// #[sqlx(type_name = "cube")]
-// struct Cube {
-//
-// }
+// TODO: is this the right type?
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "cube", rename_all = "lowercase")]
+pub enum Cube {
+    Cube,
+}
+// TODO is this the right type?
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "point", rename_all = "lowercase")]
+pub enum Point {
+    Point,
+}
 
 pub(crate) fn to_snake_case(input: &str) -> String {
     let mut output = String::new();
@@ -148,6 +154,8 @@ pub fn convert_data_type(data_type: &str) -> &str {
         "event_art_presence" => "event_art_presence",
         "cover_art_presence" => "cover_art_presence",
         "bytea" => "Vec<u8>", // is this right?
+        "cube" => "Cube",
+        "point" => "Point",
         _ => panic!("Unknown type: {}", data_type),
     }
 }
@@ -164,6 +172,8 @@ pub fn convert_data_type_from_pg(data_type: &str) -> &str {
         "chrono::NaiveDate" => "date",
         "f32" => "float4",
         "f64" => "float8",
+        "Cube" => "cube",
+        "Point" => "point",
         "uuid::Uuid" => "uuid",
         "bool" => "boolean",
         "Vec<u8>" => "bytea", // is this right ?
