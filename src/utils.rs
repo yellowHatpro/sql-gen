@@ -34,7 +34,7 @@ pub enum TaggableEntityType {
     Place,
     Recording,
     Release,
-    Release_Group,
+    ReleaseGroup,
     Series,
     Work,
 }
@@ -47,7 +47,7 @@ pub enum RatableEntityType {
     Label,
     Place,
     Recording,
-    Release_Group,
+    ReleaseGroup,
     Work,
 }
 
@@ -70,16 +70,17 @@ pub enum EventArtPresence {
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "cube", rename_all = "lowercase")]
 pub enum Cube {
-    Cube,
+    Cube(String),
 }
 // TODO is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "point", rename_all = "lowercase")]
 pub enum Point {
-    Point,
+    Point(String),
 }
 
 pub(crate) fn to_snake_case(input: &str) -> String {
+    let reserved = vec!["type"];
     let mut output = String::new();
     let mut prev_is_uppercase = false;
 
@@ -96,7 +97,16 @@ pub(crate) fn to_snake_case(input: &str) -> String {
         }
     }
 
+    if reserved.contains(&output.as_str()){
+        capitalize_first(&mut output);
+    }
     output
+}
+
+pub fn capitalize_first(s: &mut String) {
+    if let Some(v) = s.get_mut(0..1) {
+        v.make_ascii_uppercase();
+    }
 }
 
 pub fn generate_struct_code(table_name: &str, rows: &Vec<TableColumn>) -> String {
