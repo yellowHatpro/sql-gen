@@ -70,13 +70,13 @@ pub enum EventArtPresence {
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "cube", rename_all = "lowercase")]
 pub enum Cube {
-    Cube(String),
+    Cube,
 }
 // TODO is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "point", rename_all = "lowercase")]
 pub enum Point {
-    Point(String),
+    Point,
 }
 
 pub(crate) fn to_snake_case(input: &str) -> String {
@@ -115,6 +115,7 @@ pub fn generate_struct_code(table_name: &str, rows: &Vec<TableColumn>) -> String
 
     struct_code.push_str("#![allow(dead_code)]\n");
     struct_code.push_str("// Generated with sql-gen\n// https://github.com/jayy-lmao/sql-gen\n\n");
+    struct_code.push_str("use crate::schema::types::*;\n");
     struct_code.push_str("#[derive(sqlx::FromRow, Debug)]\n");
     struct_code.push_str(&format!("pub struct {} {{\n", struct_name));
 

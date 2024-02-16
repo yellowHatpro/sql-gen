@@ -1,6 +1,8 @@
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::fs;
+use std::fs::File;
+use std::io::{Read, Write};
 use std::path::Path;
 
 use crate::db_queries::get_table_columns;
@@ -39,6 +41,8 @@ pub async fn generate(
     let tables: Vec<String> = unique.into_iter().collect::<Vec<String>>();
 
     println!("Outputting tables: {:?}", tables);
+
+    generate_types_file(&output_folder);
 
     // Generate structs and queries for each table
     for table in &tables {
@@ -80,6 +84,12 @@ pub async fn generate(
     fs::write(context_file_path, context_code)?;
     Ok(())
 }
+fn generate_types_file(output_folder: &str) {
+    // This folder is for containing all the enums and structs that are not provided by default in sqlx
+    fs::create_dir_all(output_folder.to_owned() + "/types").unwrap();
+    let types = include_str!("types.txt");
+    fs::write(output_folder.to_owned()+"/types/mod.rs", types).expect("Couldn't write");
+}
 
 fn generate_db_context(database_name: &str, tables: &[String], _rows: &[TableColumn]) -> String {
     let mut db_context_code = String::new();
@@ -87,6 +97,7 @@ fn generate_db_context(database_name: &str, tables: &[String], _rows: &[TableCol
     db_context_code.push_str("#![allow(dead_code)]\n");
     db_context_code
         .push_str("// Generated with sql-gen\n//https://github.com/jayy-lmao/sql-gen\n\n");
+    db_context_code.push_str("mod types;\n");
     for table in tables {
         db_context_code.push_str(&format!("pub mod {};\n", to_snake_case(table)));
         db_context_code.push_str(&format!(
