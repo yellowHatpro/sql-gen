@@ -2,6 +2,13 @@
 
 ![codegen_example](https://github.com/jayy-lmao/sql-gen/assets/32926722/5308636d-3b5c-4fad-b250-109fb272d8b2)
 
+## This is yellowhatpro's fork, designed to work with musicbrainz db
+- to run, run mb's postgres db, and use this command to generate the entities
+```shell
+sql-gen generate --database postgres://musicbrainz:musicbrainz@localhost:5432/musicbrainz_db --output ./schema --schema musicbrainz
+```
+Please configure postgres db connection string accordingly
+
 
 PR's and Issues welcome! This is still early stages of devopment, though hopefully useful to some! 
 

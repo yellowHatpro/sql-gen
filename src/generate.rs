@@ -1,8 +1,7 @@
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::fs;
-use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Write};
 use std::path::Path;
 
 use crate::db_queries::get_table_columns;

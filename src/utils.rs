@@ -1,14 +1,15 @@
+use std::collections::HashSet;
 use crate::models::TableColumn;
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "edit_note_status", rename_all = "lowercase")]
+#[sqlx(type_name = "edit_note_status",)]
 pub enum EditNoteStatus {
     Deleted,
     Edited,
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "fluency", rename_all = "lowercase")]
+#[sqlx(type_name = "fluency")]
 pub enum Fluency {
     Basic,
     Intermediate,
@@ -17,14 +18,14 @@ pub enum Fluency {
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "oauth_code_challenge_method", rename_all = "lowercase")]
+#[sqlx(type_name = "oauth_code_challenge_method")]
 pub enum OauthCodeChallengeMethod {
     Plain,
     S256,
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "taggable_entity_type", rename_all = "lowercase")]
+#[sqlx(type_name = "taggable_entity_type",)]
 pub enum TaggableEntityType {
     Area,
     Artist,
@@ -40,7 +41,7 @@ pub enum TaggableEntityType {
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "ratable_entity_type", rename_all = "lowercase")]
+#[sqlx(type_name = "ratable_entity_type")]
 pub enum RatableEntityType {
     Artist,
     Event,
@@ -52,7 +53,7 @@ pub enum RatableEntityType {
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "cover_art_presence", rename_all = "lowercase")]
+#[sqlx(type_name = "cover_art_presence")]
 pub enum CoverArtPresence {
     Absent,
     Present,
@@ -60,7 +61,7 @@ pub enum CoverArtPresence {
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "event_art_presence", rename_all = "lowercase")]
+#[sqlx(type_name = "event_art_presence")]
 pub enum EventArtPresence {
     Absent,
     Present,
@@ -68,13 +69,13 @@ pub enum EventArtPresence {
 }
 // TODO: is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "cube", rename_all = "lowercase")]
+#[sqlx(type_name = "cube")]
 pub enum Cube {
     Cube,
 }
 // TODO is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-#[sqlx(type_name = "point", rename_all = "lowercase")]
+#[sqlx(type_name = "point")]
 pub enum Point {
     Point,
 }
@@ -97,7 +98,7 @@ pub(crate) fn to_snake_case(input: &str) -> String {
         }
     }
 
-    if reserved.contains(&output.as_str()){
+    if reserved.contains(&output.as_str()) {
         capitalize_first(&mut output);
     }
     output
@@ -112,7 +113,7 @@ pub fn capitalize_first(s: &mut String) {
 pub fn generate_struct_code(table_name: &str, rows: &Vec<TableColumn>) -> String {
     let struct_name = to_pascal_case(table_name);
     let mut struct_code = String::new();
-
+    let mut unique_cols : HashSet<String>  = HashSet::new();
     struct_code.push_str("#![allow(dead_code)]\n");
     struct_code.push_str("// Generated with sql-gen\n// https://github.com/jayy-lmao/sql-gen\n\n");
     struct_code.push_str("use crate::schema::types::*;\n");
@@ -121,6 +122,10 @@ pub fn generate_struct_code(table_name: &str, rows: &Vec<TableColumn>) -> String
 
     for row in rows {
         if row.table_name == table_name {
+            if unique_cols.contains(&row.column_name) {
+                continue;
+            }
+            unique_cols.insert((&row.column_name).to_string());
             let column_name = to_snake_case(&row.column_name);
             let mut data_type = convert_data_type(&row.udt_name);
             let optional_type = format!("Option<{}>", data_type);
@@ -147,7 +152,7 @@ pub fn convert_data_type(data_type: &str) -> &str {
         "text" => "String",
         "_text" => "String",
         "varchar" => "String",
-        "jsonb" => "sqlx::Json",
+        "jsonb" => "serde_json::Value",
         "timestamptz" => "chrono::DateTime<chrono::Utc>",
         "date" => "chrono::NaiveDate",
         "time" => "chrono::NaiveTime",
@@ -156,14 +161,16 @@ pub fn convert_data_type(data_type: &str) -> &str {
         "uuid" => "uuid::Uuid",
         "boolean" => "bool",
         "bool" => "bool",
-        "bpchar" => "char",
-        "edit_note_status" => "edit_note_status",
-        "fluency" => "fluency",
-        "oauth_code_challenge_method" => "oauth_code_challenge_method",
-        "taggable_entity_type" => "taggable_entity_type",
-        "ratable_entity_type" => "ratable_entity_type",
-        "event_art_presence" => "event_art_presence",
-        "cover_art_presence" => "cover_art_presence",
+        "bpchar" => "String",
+        "char" => "String",
+        "character" => "String",
+        "edit_note_status" => "EditNoteStatus",
+        "fluency" => "Fluency",
+        "oauth_code_challenge_method" => "OauthCodeChallengeMethod",
+        "taggable_entity_type" => "TaggableEntityType",
+        "ratable_entity_type" => "RatableEntityType",
+        "event_art_presence" => "EventArtPresence",
+        "cover_art_presence" => "CoverArtPresence",
         "bytea" => "Vec<u8>", // is this right?
         "cube" => "Cube",
         "point" => "Point",
@@ -177,7 +184,7 @@ pub fn convert_data_type_from_pg(data_type: &str) -> &str {
         "i32" => "int4",
         "i16" => "int2",
         "String" => "text",
-        "sqlx::Json" => "jsonb",
+        "serde_json::Value" => "jsonb",
         "chrono::DateTime<chrono::Utc>" => "timestamptz",
         "DateTime<Utc>" => "timestamptz",
         "chrono::NaiveDate" => "date",

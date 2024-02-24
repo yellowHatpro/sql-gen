@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-pub enum editNoteStatus {
+pub enum EditNoteStatus {
     Deleted,
     Edited,
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
-pub enum fluency {
+pub enum Fluency {
     Basic,
     Intermediate,
     Advanced,
@@ -14,14 +14,14 @@ pub enum fluency {
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "oauth_code_challenge_method", rename_all = "lowercase")]
-pub enum oauthCodeChallengeMethod {
+pub enum OauthCodeChallengeMethod {
     Plain,
     S256,
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "taggable_entity_type", rename_all = "lowercase")]
-pub enum taggableEntityType {
+pub enum TaggableEntityType {
     Area,
     Artist,
     Event,
@@ -37,7 +37,7 @@ pub enum taggableEntityType {
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "ratable_entity_type", rename_all = "lowercase")]
-pub enum ratableEntityType {
+pub enum RatableEntityType {
     Artist,
     Event,
     Label,
@@ -49,7 +49,7 @@ pub enum ratableEntityType {
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "cover_art_presence", rename_all = "lowercase")]
-pub enum coverArtPresence {
+pub enum CoverArtPresence {
     Absent,
     Present,
     Darkened,
@@ -57,7 +57,7 @@ pub enum coverArtPresence {
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "event_art_presence", rename_all = "lowercase")]
-pub enum eventArtPresence {
+pub enum EventArtPresence {
     Absent,
     Present,
     Darkened,
@@ -65,12 +65,12 @@ pub enum eventArtPresence {
 // TODO: is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "cube", rename_all = "lowercase")]
-pub enum cube {
-    Cube(String),
+pub enum Cube {
+    Cube,
 }
 // TODO is this the right type?
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type)]
 #[sqlx(type_name = "point", rename_all = "lowercase")]
-pub enum point {
-    Point(String),
+pub enum Point {
+    Point,
 }
